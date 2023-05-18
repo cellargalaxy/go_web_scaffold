@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	util.Init(model.DefaultServerName)
+	util.Init(model.ServerName)
 }
 
 func main() {

@@ -3,7 +3,7 @@ module github.com/cellargalaxy/go_web_scaffold
 go 1.19
 
 require (
-	github.com/cellargalaxy/go_common v0.0.0-20230518115804-b652fc02c249
+	github.com/cellargalaxy/go_common v0.0.0-20230518132500-07b3ab404be7
 	github.com/sirupsen/logrus v1.9.0
 )
 

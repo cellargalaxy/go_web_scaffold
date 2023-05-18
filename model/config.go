@@ -1,9 +1,6 @@
 package model
 
-const (
-	DefaultServerName = "go_web_scaffold"
-
-	ListenAddress = ":35991"
-	AddJobPath    = "/api/AddJob"
-	ListJobPath   = "/api/ListJob"
-)
+type Config struct {
+	Username string `json:"user_name" yaml:"user_name"`
+	Password string `json:"password" yaml:"password"`
+}
