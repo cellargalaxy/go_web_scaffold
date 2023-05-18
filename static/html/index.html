@@ -2,34 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>政府采购爬虫</title>
+    <title>go_web_scaffold</title>
     <link type="text/css" rel="stylesheet" href="../css/bootstrap/bootstrap.min.css"/>
     <link type="text/css" rel="stylesheet" href="../css/bootstrap/bootstrap-vue.min.css"/>
 </head>
 <body>
 <div class="container">
-    <br/>
+    <div id="go_web_scaffold">
 
-    <div id="crawler" style="height: auto">
-        <b-form-group label="爬取网址(必填)">
-            <b-form-checkbox-group v-model="sites" :options="siteOptions" stacked></b-form-checkbox-group>
-        </b-form-group>
-
-        <b-form-group label="爬取关键词(必填)">
-            <b-form-textarea v-model="word" rows="3" max-rows="6" placeholder="使用换行或者逗号分隔多个关键词"/>
-        </b-form-group>
-
-        <b-button variant="primary" @click="AddJob">开始爬取</b-button>
-        <b-button variant="primary" @click="ListJob">刷新表格</b-button>
-
-        <br/>
-        <br/>
-
-        <b-table striped hover :items="jobs" :fields="jobFields"></b-table>
     </div>
-
 </div>
 </body>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver" crossorigin="anonymous"></script>
 <script src="../js/common/vue.min.js"></script>
 <script src="../js/common/qs.min.js"></script>
 <script src="../js/common/axios.min.js"></script>
@@ -41,12 +25,12 @@
 
 <script>
 
-    let crawler_vue = new Vue({
-        el: '#crawler',
+    let vue = new Vue({
+        el: '#go_web_scaffold',
         data: {
             sites: [],
             siteOptions: [
-                {text: '广东省政府采购网', value: '广东省政府采购网'},
+                { },
             ],
             word: '',
             jobFields: [
