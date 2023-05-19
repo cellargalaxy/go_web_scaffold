@@ -4,22 +4,30 @@ go 1.19
 
 require (
 	github.com/cellargalaxy/go_common v0.0.0-20230518132500-07b3ab404be7
+	github.com/gin-gonic/gin v1.9.0
+	github.com/glebarez/sqlite v1.8.0
+	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.0
+	gorm.io/driver/mysql v1.5.0
+	gorm.io/gorm v1.25.1
 )
 
 require (
 	github.com/antonfisher/nested-logrus-formatter v1.3.1 // indirect
 	github.com/bytedance/sonic v1.8.8 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
+	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/gin-gonic/gin v1.9.0 // indirect
+	github.com/glebarez/go-sqlite v1.21.1 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.13.0 // indirect
 	github.com/go-resty/resty/v2 v2.7.0 // indirect
+	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/gocarina/gocsv v0.0.0-20230513223533-9ddd7fd60602 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/hetiansu5/urlquery v1.2.7 // indirect
 	github.com/jedib0t/go-pretty/v6 v6.4.6 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
@@ -36,7 +44,7 @@ require (
 	github.com/panjf2000/ants/v2 v2.7.4 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pelletier/go-toml/v2 v2.0.7 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
+	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
@@ -56,5 +64,8 @@ require (
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/gorm v1.25.1 // indirect
+	modernc.org/libc v1.22.3 // indirect
+	modernc.org/mathutil v1.5.0 // indirect
+	modernc.org/memory v1.5.0 // indirect
+	modernc.org/sqlite v1.21.1 // indirect
 )

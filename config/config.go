@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"fmt"
 	"github.com/cellargalaxy/go_common/util"
 	"github.com/cellargalaxy/go_web_scaffold/model"
 )
@@ -24,7 +25,7 @@ type ConfigHandler struct {
 }
 
 func (this *ConfigHandler) GetPath(ctx context.Context) string {
-	return model.ConfigPath
+	return fmt.Sprintf("%s/%s.yaml", model.ResourcePath, model.ServerName)
 }
 
 func (this *ConfigHandler) GetConfig(ctx context.Context) string {
