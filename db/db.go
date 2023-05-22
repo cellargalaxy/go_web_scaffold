@@ -2,11 +2,13 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"github.com/cellargalaxy/go_common/util"
 	"github.com/cellargalaxy/go_web_scaffold/model"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
+	"path"
 	"time"
 )
 
@@ -17,11 +19,11 @@ func init() {
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
-		Logger: util.NewGormLog(util.NewDefaultGormSqlHandle()),
+		Logger: util.NewDefaultGormLog(),
 	}
 
 	var err error
-	db, err = initDb(dbConfig)
+	db, err = initSqlite(dbConfig)
 	if err != nil {
 		panic(err)
 	}
@@ -38,16 +40,16 @@ func init() {
 	sqlDB.SetConnMaxLifetime(time.Hour)
 }
 
-func initDb(dbConfig *gorm.Config) (*gorm.DB, error) {
+func initSqlite(dbConfig *gorm.Config) (*gorm.DB, error) {
 	err := util.CreateFolderPath(util.GenCtx(), model.ResourcePath)
 	if err != nil {
 		return nil, err
 	}
-	db, err := gorm.Open(sqlite.Open(fmt.S), dbConfig)
+	db, err := gorm.Open(sqlite.Open(path.Join(model.ResourcePath, fmt.Sprintf("%s.db", model.ServerName))), dbConfig)
 	if err != nil {
 		return db, err
 	}
-	err = db.AutoMigrate(&model.Config{})
+	err = db.AutoMigrate(&model.Scaffold{})
 	return db, err
 }
 
