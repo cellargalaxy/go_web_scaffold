@@ -1,10 +1,11 @@
 package model
 
 const (
+	Version      = "0.0.0"
 	ServerName   = "go_web_scaffold"
 	ResourcePath = "resource"
 
-	ListenAddress  = ":35991"
+	ListenAddress  = ":36449"
 	LoginGetPath   = "/api/LoginGet"
 	LoginPostPath  = "/api/LoginPost"
 	AddUserPath    = "/api/AddUser"

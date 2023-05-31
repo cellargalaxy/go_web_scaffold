@@ -22,3 +22,5 @@ go.work
 
 .idea
 go_web_scaffold
+go_web_scaffold.db
+go_web_scaffold.yaml
