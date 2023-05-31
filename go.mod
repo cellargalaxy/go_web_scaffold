@@ -3,7 +3,7 @@ module github.com/cellargalaxy/go_web_scaffold
 go 1.19
 
 require (
-	github.com/cellargalaxy/go_common v0.0.0-20230518132500-07b3ab404be7
+	github.com/cellargalaxy/go_common v0.0.0-20230531144052-c3b9d1133051
 	github.com/gin-gonic/gin v1.9.0
 	github.com/glebarez/sqlite v1.8.0
 	github.com/pkg/errors v0.9.1

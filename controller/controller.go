@@ -4,16 +4,17 @@ import (
 	"context"
 	common_model "github.com/cellargalaxy/go_common/model"
 	"github.com/cellargalaxy/go_common/util"
+	"github.com/cellargalaxy/go_web_scaffold/config"
+	"github.com/cellargalaxy/go_web_scaffold/db"
 	"github.com/cellargalaxy/go_web_scaffold/model"
 	"github.com/cellargalaxy/go_web_scaffold/service"
 	"github.com/cellargalaxy/go_web_scaffold/static"
 	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
 	"net/http"
 	"strings"
 )
 
-func Controller() error {
+func Init() {
 	engine := gin.Default()
 	engine.Use(util.GinLog)
 
@@ -26,16 +27,8 @@ func Controller() error {
 	})
 	engine.StaticFS(common_model.StaticPath, http.FS(static.StaticFile))
 
-	type LoginGetReq struct {
-		Username string `json:"username" form:"username" query:"username"`
-		Password string `json:"password" form:"password" query:"password"`
-	}
-	engine.POST(model.LoginGetPath, util.NewGinPost("LoginGet", func(ctx context.Context, req LoginGetReq) (any, error) {
-		object, err := service.Login(ctx, req.Username, req.Password)
-		if err != nil {
-			return nil, err
-		}
-		return common_model.HttpData{Object: object}, nil
+	engine.GET(model.LoginGetPath, util.NewGinGet("LoginGet", func(ctx context.Context, req struct{}) (any, error) {
+		return common_model.HttpData{Object: config.Config}, nil
 	}))
 
 	type LoginPostReq struct {
@@ -50,9 +43,46 @@ func Controller() error {
 		return common_model.HttpData{Object: object}, nil
 	}))
 
+	type AddUserReq struct {
+		Object []*model.User `json:"object"`
+	}
+	engine.POST(model.AddUserPath, util.NewGinPost("AddUser", func(ctx context.Context, req AddUserReq) (any, error) {
+		object, err := db.User.Add(ctx, req.Object...)
+		if err != nil {
+			return nil, err
+		}
+		return common_model.HttpData{Object: object}, nil
+	}))
+
+	engine.POST(model.RemoveUserPath, util.NewGinPost("RemoveUser", func(ctx context.Context, req model.UserInquiry) (any, error) {
+		err := db.User.Remove(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+		return common_model.HttpData{}, nil
+	}))
+
+	type EditUserReq struct {
+		Object *model.User `json:"object"`
+	}
+	engine.POST(model.EditUserPath, util.NewGinPost("EditUser", func(ctx context.Context, req EditUserReq) (any, error) {
+		object, count, err := db.User.Edit(ctx, req.Object)
+		if err != nil {
+			return nil, err
+		}
+		return common_model.HttpData{Object: object, Count: count}, nil
+	}))
+
+	engine.GET(model.ListUserPath, util.NewGinGet("ListUser", func(ctx context.Context, req model.UserInquiry) (any, error) {
+		object, count, err := db.User.List(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+		return common_model.HttpData{Object: object, Count: count}, nil
+	}))
+
 	err := engine.Run(model.ListenAddress)
 	if err != nil {
-		errors.Errorf("web服务启动，异常: %+v", err)
+		panic(err)
 	}
-	return nil
 }

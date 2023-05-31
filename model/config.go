@@ -1,14 +1,12 @@
 package model
 
 import (
-	"github.com/cellargalaxy/go_common/model"
 	"github.com/cellargalaxy/go_common/util"
 )
 
 type Config struct {
-	model.Model
-	Username string `json:"user_name" yaml:"user_name" gorm:"user_name"`
-	Password string `json:"password" yaml:"password" gorm:"password"`
+	Username string `json:"user_name" yaml:"user_name"`
+	Password string `json:"password" yaml:"password"`
 }
 
 func (this Config) String() string {
