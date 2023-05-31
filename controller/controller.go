@@ -9,6 +9,7 @@ import (
 	"github.com/cellargalaxy/go_web_scaffold/model"
 	"github.com/cellargalaxy/go_web_scaffold/service"
 	"github.com/cellargalaxy/go_web_scaffold/static"
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -17,6 +18,9 @@ import (
 func Init() {
 	engine := gin.Default()
 	engine.Use(util.GinLog)
+
+	debug := engine.Group(common_model.DebugPath)
+	pprof.RouteRegister(debug, common_model.PprofPath)
 
 	engine.GET(common_model.PingPath, util.Ping)
 
