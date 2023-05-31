@@ -22,14 +22,14 @@ func Init() {
 	debug := engine.Group(common_model.DebugPath)
 	pprof.RouteRegister(debug, common_model.PprofPath)
 
-	engine.GET(common_model.PingPath, util.Ping)
-
 	engine.Use(func(c *gin.Context) {
 		if strings.HasPrefix(c.Request.RequestURI, common_model.StaticPath) {
 			c.Header("Cache-Control", "max-age=86400")
 		}
 	})
 	engine.StaticFS(common_model.StaticPath, http.FS(static.StaticFile))
+
+	engine.GET(common_model.PingPath, util.Ping)
 
 	engine.GET(model.LoginGetPath, util.NewGinGet("LoginGet", func(ctx context.Context, req struct{}) (any, error) {
 		return common_model.HttpData{Object: config.Config}, nil
