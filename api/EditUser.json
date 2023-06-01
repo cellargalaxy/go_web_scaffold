@@ -7,7 +7,7 @@
       "id": 123456,
       "created_at": 111111,
       "updated_at": 222222,
-      "user_name": "user_name",
+      "username": "username",
       "password": "password"
     }
   }

@@ -11,10 +11,9 @@
 <div class="container">
     <br/>
 
-    <div id="register">
-        <b-alert v-if="registered" show dismissible variant="success">已激活</b-alert>
-        <b-alert v-else show dismissible variant="danger">未激活</b-alert>
-        <b-alert v-if="!configed" show dismissible variant="danger">未配置百度OCR</b-alert>
+    <div id="login">
+        <b-alert show dismissible variant="success">账号：{{}}</b-alert>
+        <b-alert show dismissible variant="success">密码：{{}}</b-alert>
 
         <b-form-group label="激活到期日(必填)">
             <b-form-datepicker placeholder="激活到期日" v-model="expire_date" :min="new Date()"></b-form-datepicker>
@@ -74,18 +73,15 @@
 
 <script>
 
-    let register_vue = new Vue({
-        el: '#register',
+    let login_vue = new Vue({
+        el: '#login',
         data: {
             config: {
-                baidu_ocr_api_key: "",
-                baidu_ocr_secret_key: "",
-                jwt: ""
+                username: "",
+                password: "",
             },
-            expire_date: "",
-            activation_code: "",
-            baidu_ocr_api_key: "",
-            baidu_ocr_secret_key: "",
+            username: "",
+            password: "",
         },
         computed: {
             registered: function () {

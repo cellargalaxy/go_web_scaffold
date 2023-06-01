@@ -4,7 +4,7 @@
   "data": {
     "count": 0,
     "object": {
-      "user_name": "user_name",
+      "username": "username",
       "password": "password"
     }
   }
