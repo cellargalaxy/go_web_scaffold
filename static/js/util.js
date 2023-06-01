@@ -183,6 +183,13 @@ function formatDate(date, fmt) {
     return fmt
 }
 
+function reFormatDate(str, fmt) {
+    let ts = new Date(str).getTime()
+    if (ts <= 0) {
+        return '-'
+    }
+    return formatTimestamp(ts, fmt)
+}
 
 function getAddYearDate(year) {
     let before = new Date()

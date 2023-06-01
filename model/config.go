@@ -5,7 +5,7 @@ import (
 )
 
 type Config struct {
-	Username string `json:"user_name" yaml:"user_name"`
+	Username string `json:"username" yaml:"username"`
 	Password string `json:"password" yaml:"password"`
 }
 

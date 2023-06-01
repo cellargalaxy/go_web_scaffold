@@ -7,7 +7,7 @@ import (
 
 type User struct {
 	model.Model
-	Username string `json:"user_name" yaml:"user_name" gorm:"user_name"`
+	Username string `json:"username" yaml:"username" gorm:"username"`
 	Password string `json:"password" yaml:"password" gorm:"password"`
 }
 

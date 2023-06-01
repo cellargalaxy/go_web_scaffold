@@ -12,42 +12,39 @@
     <br/>
 
     <div id="login">
-        <b-alert show dismissible variant="success">账号：{{}}</b-alert>
-        <b-alert show dismissible variant="success">密码：{{}}</b-alert>
+        <b-alert v-if="isLogin" show dismissible variant="success">已登陆</b-alert>
+        <b-alert v-else show dismissible variant="danger">
+            未登陆，账号：<code>{{config.username}}</code>，密码：<code>{{config.password}}</code>
+        </b-alert>
 
-        <b-form-group label="激活到期日(必填)">
-            <b-form-datepicker placeholder="激活到期日" v-model="expire_date" :min="new Date()"></b-form-datepicker>
+        <b-form-group label="账号">
+            <b-form-input placeholder="账号" v-model="username"></b-form-input>
         </b-form-group>
-        <b-form-group label="激活码(必填)">
-            <b-form-input placeholder="激活码" v-model="activation_code"></b-form-input>
+        <b-form-group label="密码">
+            <b-form-input placeholder="密码" type="password" v-model="password"></b-form-input>
         </b-form-group>
-        <b-form-group label="百度OCR ApiKey(必填)">
-            <b-form-input placeholder="百度OCR ApiKey" v-model="baidu_ocr_api_key"></b-form-input>
-        </b-form-group>
-        <b-form-group label="百度OCR SecretKey(必填)">
-            <b-form-input placeholder="百度OCR SecretKey" v-model="baidu_ocr_secret_key"></b-form-input>
-        </b-form-group>
-        <b-button variant="primary" @click="Register">激活</b-button>
+
+        <b-button variant="outline-primary" @click="LoginGet">刷新</b-button>
+        <b-button variant="outline-success" @click="LoginPost">登陆</b-button>
     </div>
 
     <hr style="border: 0.1rem solid"/>
 
-    <div id="crawler" style="height: auto">
-        <b-form-group label="爬取网址(必填)">
-            <b-form-checkbox-group v-model="sites" :options="siteOptions" stacked></b-form-checkbox-group>
+    <div id="user">
+        <b-form-group label="账号">
+            <b-form-input placeholder="账号" v-model="username"></b-form-input>
+        </b-form-group>
+        <b-form-group label="密码">
+            <b-form-input placeholder="密码" type="password" v-model="password"></b-form-input>
         </b-form-group>
 
-        <b-form-group label="爬取关键词(必填)">
-            <b-form-textarea v-model="word" rows="3" max-rows="6" placeholder="使用换行或者逗号分隔多个关键词"/>
-        </b-form-group>
-
-        <b-button variant="primary" @click="AddJob">开始爬取</b-button>
-        <b-button variant="primary" @click="ListJob">刷新表格</b-button>
+        <b-button variant="outline-primary" @click="ListUser">刷新</b-button>
+        <b-button variant="outline-success" @click="AddUser">添加</b-button>
 
         <br/>
         <br/>
 
-        <b-table striped hover :items="jobs" :fields="jobFields"></b-table>
+        <b-table striped hover :items="users" :fields="userFields"></b-table>
     </div>
 
 </div>
@@ -77,109 +74,88 @@
         el: '#login',
         data: {
             config: {
-                username: "",
-                password: "",
+                username: '',
+                password: '',
             },
-            username: "",
-            password: "",
+            username: '',
+            password: '',
         },
         computed: {
-            registered: function () {
-                return this.config != null && this.config.jwt !== ''
-            },
-            configed: function () {
-                return this.config != null && this.config.baidu_ocr_api_key !== '' && this.config.baidu_ocr_secret_key !== ''
+            isLogin: function () {
+                return getSecret() !== ''
             },
         },
         methods: {
-            async GetConfig() {
-                let promise = GetConfig()
+            async LoginGet() {
+                let promise = LoginGet()
                 let data = await promise
                 if (data !== null && data.object != null) {
                     this.config = data.object
                 }
             },
-            async Register() {
-                let promise = Register(this.expire_date, this.activation_code, this.baidu_ocr_api_key, this.baidu_ocr_secret_key)
+            async LoginPost() {
+                let promise = LoginPost(this.username, this.password)
                 let data = await promise
                 if (data !== null) {
-                    alert('激活成功')
+                    this.isLogin = true
+                    setSecret(this.password)
                 } else {
-                    alert('激活失败')
+                    this.isLogin = false
+                    setSecret('')
                 }
             },
         },
     })
-    register_vue.GetConfig()
-    setInterval("register_vue.GetConfig()", "1000")
+    login_vue.LoginGet()
 
-    let crawler_vue = new Vue({
-        el: '#crawler',
+    let user_vue = new Vue({
+        el: '#user',
         data: {
-            sites: [],
-            siteOptions: [
-                {text: '广东省政府采购网', value: '广东省政府采购网'},
-            ],
-            word: '',
-            jobFields: [
-                {key: 'id', label: '任务编号', sortable: true},
-                {key: 'site', label: '爬取网站', sortable: true},
-                {key: 'word', label: '爬取关键词', sortable: true},
-                {key: 'status', label: '任务状态', sortable: true},
-                {key: 'yet_crawler', label: '爬取数量', sortable: true},
-                {key: 'fail_reason', label: '失败原因', sortable: true},
-                {key: 'created_at', label: '创建时间', sortable: true},
-                {key: 'start_time', label: '开始时间', sortable: true},
-                {key: 'end_time', label: '完成时间', sortable: true},
+            username: '',
+            password: '',
+            users: [],
+            userFields: [
+                {key: 'id', label: 'id', sortable: true},
+                {key: 'username', label: 'username', sortable: true},
+                {key: 'password', label: 'password', sortable: true},
+                {key: 'created_at', label: 'created_at', sortable: true},
+                {key: 'updated_at', label: 'updated_at', sortable: true},
             ],
             jobs: [],
         },
         methods: {
-            async AddJob() {
-                let promise = AddJob(this.sites, this.word)
+            async AddUser() {
+                if (!login_vue.isLogin) {
+                    alert('未登陆')
+                }
+
+                let promise = AddUser(this.username, this.password)
                 let data = await promise
                 if (data !== null) {
                     alert('添加成功')
-                }else {
+                } else {
                     alert('添加失败')
                 }
             },
-            async ListJob() {
-                let promise = ListJob()
-                let data = await promise
-                if (data == null) {
-                    data = []
+            async ListUser() {
+                if (!login_vue.isLogin) {
+                    return
                 }
-                if (data.object == null) {
-                    data.object = []
-                }
-                for (let i = 0; i < data.object.length; i++) {
-                    data.object[i].created_at = new Date(data.object[i].created_at).getTime()
-                    data.object[i].start_time = new Date(data.object[i].start_time).getTime()
-                    data.object[i].end_time = new Date(data.object[i].end_time).getTime()
 
-                    if (data.object[i].created_at > 0) {
-                        data.object[i].created_at = formatTimestamp(data.object[i].created_at, 'YYYY-MM-DD HH:mm:ss')
-                    } else {
-                        data.object[i].created_at = '-'
+                let promise = ListUser()
+                let data = await promise
+                if (data !== null && data.object != null) {
+                    for (let i = 0; i < data.object.length; i++) {
+                        data.object[i].created_at = reFormatDate(data.object[i].created_at, 'YYYY-MM-DD HH:mm:ss')
+                        data.object[i].updated_at = reFormatDate(data.object[i].updated_at, 'YYYY-MM-DD HH:mm:ss')
                     }
-                    if (data.object[i].start_time > 0) {
-                        data.object[i].start_time = formatTimestamp(data.object[i].start_time, 'YYYY-MM-DD HH:mm:ss')
-                    } else {
-                        data.object[i].start_time = '-'
-                    }
-                    if (data.object[i].end_time > 0) {
-                        data.object[i].end_time = formatTimestamp(data.object[i].end_time, 'YYYY-MM-DD HH:mm:ss')
-                    } else {
-                        data.object[i].end_time = '-'
-                    }
+                    this.users = data.object
                 }
-                this.jobs = data.object
             },
         },
     })
-    crawler_vue.ListJob()
-    setInterval("crawler_vue.ListJob()", "1000")
+    user_vue.ListUser()
+    setInterval("user_vue.ListUser()", "1000")
 
 </script>
 </html>

@@ -31,7 +31,7 @@ func Init() {
 	engine.StaticFS(common_model.StaticPath, http.FS(static.StaticFile))
 
 	engine.GET(common_model.PingPath, util.Ping)
-	engine.POST(common_model.PingPath, util.Ping, validate)
+	engine.POST(common_model.PingPath, validate, util.Ping)
 
 	engine.GET(model.LoginGetPath, util.NewGinGet("LoginGet", func(ctx context.Context, req struct{}) (any, error) {
 		return common_model.HttpData{Object: config.Config}, nil
@@ -52,40 +52,40 @@ func Init() {
 	type AddUserReq struct {
 		Object []*model.User `json:"object"`
 	}
-	engine.POST(model.AddUserPath, util.NewGinPost("AddUser", func(ctx context.Context, req AddUserReq) (any, error) {
+	engine.POST(model.AddUserPath, validate, util.NewGinPost("AddUser", func(ctx context.Context, req AddUserReq) (any, error) {
 		object, err := db.User.Add(ctx, req.Object...)
 		if err != nil {
 			return nil, err
 		}
 		return common_model.HttpData{Object: object}, nil
-	}), validate)
+	}))
 
-	engine.POST(model.RemoveUserPath, util.NewGinPost("RemoveUser", func(ctx context.Context, req model.UserInquiry) (any, error) {
+	engine.POST(model.RemoveUserPath, validate, util.NewGinPost("RemoveUser", func(ctx context.Context, req model.UserInquiry) (any, error) {
 		err := db.User.Remove(ctx, req)
 		if err != nil {
 			return nil, err
 		}
 		return common_model.HttpData{}, nil
-	}), validate)
+	}))
 
 	type EditUserReq struct {
 		Object *model.User `json:"object"`
 	}
-	engine.POST(model.EditUserPath, util.NewGinPost("EditUser", func(ctx context.Context, req EditUserReq) (any, error) {
+	engine.POST(model.EditUserPath, validate, util.NewGinPost("EditUser", func(ctx context.Context, req EditUserReq) (any, error) {
 		object, count, err := db.User.Edit(ctx, req.Object)
 		if err != nil {
 			return nil, err
 		}
 		return common_model.HttpData{Object: object, Count: count}, nil
-	}), validate)
+	}))
 
-	engine.GET(model.ListUserPath, util.NewGinGet("ListUser", func(ctx context.Context, req model.UserInquiry) (any, error) {
+	engine.GET(model.ListUserPath, validate, util.NewGinGet("ListUser", func(ctx context.Context, req model.UserInquiry) (any, error) {
 		object, count, err := db.User.List(ctx, req)
 		if err != nil {
 			return nil, err
 		}
 		return common_model.HttpData{Object: object, Count: count}, nil
-	}), validate)
+	}))
 
 	err := engine.Run(model.ListenAddress)
 	if err != nil {
