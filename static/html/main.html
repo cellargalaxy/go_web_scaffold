@@ -44,7 +44,11 @@
         <br/>
         <br/>
 
-        <b-table striped hover :items="users" :fields="userFields"></b-table>
+        <b-table striped hover :items="users" :fields="userFields">
+            <template #cell(operate)="data">
+                <b-button variant="outline-danger" @click="RemoveUser(data.item.id)">删除</b-button>
+            </template>
+        </b-table>
     </div>
 
 </div>
@@ -120,6 +124,7 @@
                 {key: 'password', label: 'password', sortable: true},
                 {key: 'created_at', label: 'created_at', sortable: true},
                 {key: 'updated_at', label: 'updated_at', sortable: true},
+                {key: 'operate', label: 'operate'},
             ],
             jobs: [],
         },
@@ -135,6 +140,19 @@
                     alert('添加成功')
                 } else {
                     alert('添加失败')
+                }
+            },
+            async RemoveUser(id) {
+                if (!login_vue.isLogin) {
+                    alert('未登陆')
+                }
+
+                let promise = RemoveUser(id)
+                let data = await promise
+                if (data !== null) {
+                    alert('删除成功')
+                } else {
+                    alert('删除失败')
                 }
             },
             async ListUser() {
