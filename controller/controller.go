@@ -18,8 +18,9 @@ import (
 func Init() {
 	engine := gin.Default()
 	engine.Use(util.GinLog)
+	engine.Use(claims)
 
-	debug := engine.Group(common_model.DebugPath)
+	debug := engine.Group(common_model.DebugPath, validate)
 	pprof.RouteRegister(debug, common_model.PprofPath)
 
 	engine.Use(func(c *gin.Context) {
@@ -30,6 +31,7 @@ func Init() {
 	engine.StaticFS(common_model.StaticPath, http.FS(static.StaticFile))
 
 	engine.GET(common_model.PingPath, util.Ping)
+	engine.POST(common_model.PingPath, util.Ping, validate)
 
 	engine.GET(model.LoginGetPath, util.NewGinGet("LoginGet", func(ctx context.Context, req struct{}) (any, error) {
 		return common_model.HttpData{Object: config.Config}, nil
@@ -56,7 +58,7 @@ func Init() {
 			return nil, err
 		}
 		return common_model.HttpData{Object: object}, nil
-	}))
+	}), validate)
 
 	engine.POST(model.RemoveUserPath, util.NewGinPost("RemoveUser", func(ctx context.Context, req model.UserInquiry) (any, error) {
 		err := db.User.Remove(ctx, req)
@@ -64,7 +66,7 @@ func Init() {
 			return nil, err
 		}
 		return common_model.HttpData{}, nil
-	}))
+	}), validate)
 
 	type EditUserReq struct {
 		Object *model.User `json:"object"`
@@ -75,7 +77,7 @@ func Init() {
 			return nil, err
 		}
 		return common_model.HttpData{Object: object, Count: count}, nil
-	}))
+	}), validate)
 
 	engine.GET(model.ListUserPath, util.NewGinGet("ListUser", func(ctx context.Context, req model.UserInquiry) (any, error) {
 		object, count, err := db.User.List(ctx, req)
@@ -83,10 +85,17 @@ func Init() {
 			return nil, err
 		}
 		return common_model.HttpData{Object: object, Count: count}, nil
-	}))
+	}), validate)
 
 	err := engine.Run(model.ListenAddress)
 	if err != nil {
 		panic(err)
 	}
+}
+
+func claims(c *gin.Context) {
+	util.ClaimsGin(c, config.Config.Password)
+}
+func validate(c *gin.Context) {
+	util.ValidateGin(c, config.Config.Password)
 }

@@ -1,3 +1,54 @@
+async function httpGet(instance, url, param) {
+    if (document.domain === 'localhost') {
+        url += '.json'
+    }
+    try {
+        let resp = await instance.get(url, {
+            params: param,
+            paramsSerializer: params => {
+                return Qs.stringify(params, {indices: false})
+            }
+        })
+        return dealResp(resp)
+    } catch (error) {
+        dealErr(error)
+    }
+    return null
+}
+
+async function httpPost(instance, url, param) {
+    if (document.domain === 'localhost') {
+        url += '.json'
+    }
+    try {
+        let resp = await instance.post(url, param)
+        return dealResp(resp)
+    } catch (error) {
+        dealErr(error)
+    }
+    return null
+}
+
+function dealResp(resp) {
+    let result = resp.data
+    if (result.code !== 1) {
+        dealErr(result.msg)
+        return null
+    }
+    return result.data
+}
+
+function dealErr(error) {
+    let msg = JSON.stringify(error)
+    if (msg === undefined || msg == null || msg === '' || msg === '{}' || msg === '[]') {
+        msg = error
+    }
+    alert("error: " + msg)
+    log(msg)
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
 function enSha256(text) {
     if (text === undefined || text == null) {
         text = ''
@@ -59,6 +110,8 @@ function deAESCBC(text, secret) {
     return decrypt.toString(CryptoJS.enc.Utf8)
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+
 const secretKey = 'secret'
 
 function getSecret() {
@@ -84,7 +137,7 @@ function setTokenExp(exp) {
 }
 
 function enJwt() {
-    const timeStamp = getTimeStamp()
+    const timeStamp = getNowTimestamp()
     const exp = getTokenExp()
     const header = {'typ': 'JWT', 'alg': 'HS256'}
     const headerJson = JSON.stringify(header)
@@ -95,15 +148,14 @@ function enJwt() {
     return KJUR.jws.JWS.sign("HS256", headerJson, payloadJson, {hex: secretHex})
 }
 
-function isNum(s) {
-    if (s != null && s !== '') {
-        return !isNaN(s)
-    }
-    return false
+//----------------------------------------------------------------------------------------------------------------------
+
+function getNowTimestamp(date) {
+    return getTimestamp(new Date())
 }
 
-function getTimeStamp() {
-    return Date.parse(new Date()) / 1000
+function getTimestamp(date) {
+    return Date.parse(date) / 1000
 }
 
 function formatTimestamp(timestamp, fmt) {
@@ -131,11 +183,31 @@ function formatDate(date, fmt) {
     return fmt
 }
 
-function genId() {
-    return formatDate(new Date(), 'YYMMDDHHmmssS') + 'web' + randomWord()
+
+function getAddYearDate(year) {
+    let before = new Date()
+    before.setFullYear(before.getFullYear() + year)
+    return before
 }
 
-function randomWord() {
+function parse2BeijingTimestamp(date) {
+    let timestamp = 0
+    if (date !== undefined && date != null && date !== '') {
+        timestamp = Date.parse(date + ' GMT+8') / 1000
+    }
+    if (!isNum(timestamp)) {
+        timestamp = 0
+    }
+    return timestamp
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+function genId() {
+    return formatDate(new Date(), 'YYMMDDHHmmssS') + 'web' + randomChar()
+}
+
+function randomChar() {
     let words = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
@@ -151,7 +223,7 @@ function getQueryString(name) {
     return null
 }
 
-function startsWith(string, start) {
+function startWith(string, start) {
     return string.indexOf(start) === 0
 }
 
@@ -179,22 +251,7 @@ function toString(value) {
     }
 }
 
-function getAddYearDate(year) {
-    let before = new Date()
-    before.setFullYear(before.getFullYear() + year)
-    return before
-}
-
-function parse2BeijingTimestamp(date) {
-    let timestamp = 0
-    if (date !== undefined && date != null && date !== '') {
-        timestamp = Date.parse(date + ' GMT+8') / 1000
-    }
-    if (!isNum(timestamp)) {
-        timestamp = 0
-    }
-    return timestamp
-}
+//----------------------------------------------------------------------------------------------------------------------
 
 function writeClipboard(text) {
     const textarea = document.createElement('textarea')
@@ -214,13 +271,3 @@ function log(...data) {
     console.log('log', data)
 }
 
-function sortCompare(aRow, bRow, key, sortDesc, formatter, compareOptions, compareLocale) {
-    let a = aRow[key]
-    let b = bRow[key]
-    if (isNum(a) && isNum(b)) {
-        a = parseFloat(a)
-        b = parseFloat(b)
-        return a < b ? -1 : a > b ? 1 : 0
-    }
-    return toString(a).localeCompare(toString(b), compareLocale, compareOptions)
-}

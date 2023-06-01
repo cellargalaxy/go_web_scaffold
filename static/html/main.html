@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>脚手架</title>
+
+    <link type="text/css" rel="stylesheet" href="../css/bootstrap/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="../css/bootstrap/bootstrap-vue.min.css"/>
+</head>
+<body>
+<div class="container">
+    <br/>
+
+    <div id="register">
+        <b-alert v-if="registered" show dismissible variant="success">已激活</b-alert>
+        <b-alert v-else show dismissible variant="danger">未激活</b-alert>
+        <b-alert v-if="!configed" show dismissible variant="danger">未配置百度OCR</b-alert>
+
+        <b-form-group label="激活到期日(必填)">
+            <b-form-datepicker placeholder="激活到期日" v-model="expire_date" :min="new Date()"></b-form-datepicker>
+        </b-form-group>
+        <b-form-group label="激活码(必填)">
+            <b-form-input placeholder="激活码" v-model="activation_code"></b-form-input>
+        </b-form-group>
+        <b-form-group label="百度OCR ApiKey(必填)">
+            <b-form-input placeholder="百度OCR ApiKey" v-model="baidu_ocr_api_key"></b-form-input>
+        </b-form-group>
+        <b-form-group label="百度OCR SecretKey(必填)">
+            <b-form-input placeholder="百度OCR SecretKey" v-model="baidu_ocr_secret_key"></b-form-input>
+        </b-form-group>
+        <b-button variant="primary" @click="Register">激活</b-button>
+    </div>
+
+    <hr style="border: 0.1rem solid"/>
+
+    <div id="crawler" style="height: auto">
+        <b-form-group label="爬取网址(必填)">
+            <b-form-checkbox-group v-model="sites" :options="siteOptions" stacked></b-form-checkbox-group>
+        </b-form-group>
+
+        <b-form-group label="爬取关键词(必填)">
+            <b-form-textarea v-model="word" rows="3" max-rows="6" placeholder="使用换行或者逗号分隔多个关键词"/>
+        </b-form-group>
+
+        <b-button variant="primary" @click="AddJob">开始爬取</b-button>
+        <b-button variant="primary" @click="ListJob">刷新表格</b-button>
+
+        <br/>
+        <br/>
+
+        <b-table striped hover :items="jobs" :fields="jobFields"></b-table>
+    </div>
+
+</div>
+</body>
+<script src="../js/common/vue.min.js"></script>
+<script src="../js/common/qs.min.js"></script>
+<script src="../js/common/axios.min.js"></script>
+<script src="../js/bootstrap/bootstrap-vue.min.js"></script>
+<script src="../js/bootstrap/bootstrap-vue-icons.min.js"></script>
+
+<!-- 关于crypto-js的导入与使用 -->
+<!-- https://www.jianshu.com/p/90540249747d -->
+<!-- https://github.com/kjur/jsrsasign/issues/232 -->
+<!-- https://stackoverflow.com/questions/57416217/cryptojs-encrypt-in-aes-256-cbc-returns-an-unexpected-value -->
+<script src="../js/crypto/core.min.js"></script>
+<script src="../js/crypto/enc-base64.min.js"></script>
+<script src="../js/crypto/md5.min.js"></script>
+<script src="../js/crypto/evpkdf.min.js"></script>
+<script src="../js/crypto/jsrsasign-all-min.min.js"></script>
+
+<script src="../js/util.js"></script>
+<script src="../js/api.js"></script>
+
+<script>
+
+    let register_vue = new Vue({
+        el: '#register',
+        data: {
+            config: {
+                baidu_ocr_api_key: "",
+                baidu_ocr_secret_key: "",
+                jwt: ""
+            },
+            expire_date: "",
+            activation_code: "",
+            baidu_ocr_api_key: "",
+            baidu_ocr_secret_key: "",
+        },
+        computed: {
+            registered: function () {
+                return this.config != null && this.config.jwt !== ''
+            },
+            configed: function () {
+                return this.config != null && this.config.baidu_ocr_api_key !== '' && this.config.baidu_ocr_secret_key !== ''
+            },
+        },
+        methods: {
+            async GetConfig() {
+                let promise = GetConfig()
+                let data = await promise
+                if (data !== null && data.object != null) {
+                    this.config = data.object
+                }
+            },
+            async Register() {
+                let promise = Register(this.expire_date, this.activation_code, this.baidu_ocr_api_key, this.baidu_ocr_secret_key)
+                let data = await promise
+                if (data !== null) {
+                    alert('激活成功')
+                } else {
+                    alert('激活失败')
+                }
+            },
+        },
+    })
+    register_vue.GetConfig()
+    setInterval("register_vue.GetConfig()", "1000")
+
+    let crawler_vue = new Vue({
+        el: '#crawler',
+        data: {
+            sites: [],
+            siteOptions: [
+                {text: '广东省政府采购网', value: '广东省政府采购网'},
+            ],
+            word: '',
+            jobFields: [
+                {key: 'id', label: '任务编号', sortable: true},
+                {key: 'site', label: '爬取网站', sortable: true},
+                {key: 'word', label: '爬取关键词', sortable: true},
+                {key: 'status', label: '任务状态', sortable: true},
+                {key: 'yet_crawler', label: '爬取数量', sortable: true},
+                {key: 'fail_reason', label: '失败原因', sortable: true},
+                {key: 'created_at', label: '创建时间', sortable: true},
+                {key: 'start_time', label: '开始时间', sortable: true},
+                {key: 'end_time', label: '完成时间', sortable: true},
+            ],
+            jobs: [],
+        },
+        methods: {
+            async AddJob() {
+                let promise = AddJob(this.sites, this.word)
+                let data = await promise
+                if (data !== null) {
+                    alert('添加成功')
+                }else {
+                    alert('添加失败')
+                }
+            },
+            async ListJob() {
+                let promise = ListJob()
+                let data = await promise
+                if (data == null) {
+                    data = []
+                }
+                if (data.object == null) {
+                    data.object = []
+                }
+                for (let i = 0; i < data.object.length; i++) {
+                    data.object[i].created_at = new Date(data.object[i].created_at).getTime()
+                    data.object[i].start_time = new Date(data.object[i].start_time).getTime()
+                    data.object[i].end_time = new Date(data.object[i].end_time).getTime()
+
+                    if (data.object[i].created_at > 0) {
+                        data.object[i].created_at = formatTimestamp(data.object[i].created_at, 'YYYY-MM-DD HH:mm:ss')
+                    } else {
+                        data.object[i].created_at = '-'
+                    }
+                    if (data.object[i].start_time > 0) {
+                        data.object[i].start_time = formatTimestamp(data.object[i].start_time, 'YYYY-MM-DD HH:mm:ss')
+                    } else {
+                        data.object[i].start_time = '-'
+                    }
+                    if (data.object[i].end_time > 0) {
+                        data.object[i].end_time = formatTimestamp(data.object[i].end_time, 'YYYY-MM-DD HH:mm:ss')
+                    } else {
+                        data.object[i].end_time = '-'
+                    }
+                }
+                this.jobs = data.object
+            },
+        },
+    })
+    crawler_vue.ListJob()
+    setInterval("crawler_vue.ListJob()", "1000")
+
+</script>
+</html>
