@@ -19,17 +19,10 @@ func (this User) TableName() string {
 }
 
 type UserInquiry struct {
-	Offset int `json:"offset"`
-	Limit  int `json:"limit"`
+	model.Inquiry
 	User
 }
 
 func (this UserInquiry) String() string {
 	return util.JsonStruct2String(this)
-}
-func (this UserInquiry) GetOffset() int {
-	return this.Offset
-}
-func (this UserInquiry) GetLimit() int {
-	return this.Limit
 }
