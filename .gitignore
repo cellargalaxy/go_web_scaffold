@@ -21,6 +21,10 @@
 go.work
 
 .idea
+output
 go_web_scaffold
+go_web_scaffold.exe
+go_web_scaffold.linux
+go_web_scaffold.mac
 go_web_scaffold.db
 go_web_scaffold.yaml

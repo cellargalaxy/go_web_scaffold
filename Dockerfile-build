@@ -1,0 +1,18 @@
+FROM golang:alpine AS builder
+ENV GOPROXY="https://goproxy.cn,direct"
+ENV GO111MODULE=on
+WORKDIR /
+COPY . .
+RUN go mod download
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /linux
+RUN CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o /exe
+RUN CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o /mac
+
+FROM golang:alpine
+COPY --from=builder /linux /go_web_scaffold.linux
+COPY --from=builder /exe /go_web_scaffold.exe
+COPY --from=builder /mac /go_web_scaffold.mac
+COPY --from=builder /copy_exe.sh /copy_exe.sh
+RUN chmod +x /copy_exe.sh
+WORKDIR /
+CMD ["/copy_exe.sh"]
