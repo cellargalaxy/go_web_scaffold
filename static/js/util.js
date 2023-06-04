@@ -184,6 +184,12 @@ function formatDate(date, fmt) {
 }
 
 function reFormatDate(str, fmt) {
+    if (isNum(str)) {
+        if (str <= 0) {
+            return '-'
+        }
+        return formatTimestamp(str, fmt)
+    }
     let ts = new Date(str).getTime()
     if (ts <= 0) {
         return '-'
