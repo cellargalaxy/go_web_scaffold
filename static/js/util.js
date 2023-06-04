@@ -150,16 +150,16 @@ function enJwt() {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-function getNowTimestamp(date) {
+function getNowTimestamp() {
     return getTimestamp(new Date())
 }
 
 function getTimestamp(date) {
-    return Date.parse(date) / 1000
+    return date.getTime() / 1000
 }
 
 function formatTimestamp(timestamp, fmt) {
-    return formatDate(new Date(timestamp), fmt)
+    return formatDate(new Date(timestamp * 1000), fmt)
 }
 
 function formatDate(date, fmt) {
@@ -190,7 +190,7 @@ function reFormatDate(str, fmt) {
         }
         return formatTimestamp(str, fmt)
     }
-    let ts = new Date(str).getTime()
+    let ts = getTimestamp(new Date(str))
     if (ts <= 0) {
         return '-'
     }
