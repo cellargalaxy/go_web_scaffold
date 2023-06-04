@@ -12,7 +12,7 @@ FROM golang:alpine
 COPY --from=builder /linux /go_web_scaffold.linux
 COPY --from=builder /exe /go_web_scaffold.exe
 COPY --from=builder /mac /go_web_scaffold.mac
-COPY --from=builder /copy_exe.sh /copy_exe.sh
-RUN chmod +x /copy_exe.sh
+COPY --from=builder /copy-build.sh /copy-build.sh
+RUN chmod +x /copy-build.sh
 WORKDIR /
-CMD ["/copy_exe.sh"]
+CMD ["/copy-build.sh"]
